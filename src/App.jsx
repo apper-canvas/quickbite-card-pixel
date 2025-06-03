@@ -26,10 +26,9 @@ function App() {
           clearCart={cart.clearCart}
           addToCart={cart.addToCart}
         >
-          <Routes>
+<Routes>
             <Route path="/" element={<RestaurantsPage />} />
-            <Route path="/restaurant/:id" element={<MenuPage addToCart={cart.addToCart} />} />
-            <Route path="/menu/:restaurantId" element={<MenuPage />} />
+            <Route path="/restaurant/:restaurantId" element={<MenuPage addToCart={cart.addToCart} />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
