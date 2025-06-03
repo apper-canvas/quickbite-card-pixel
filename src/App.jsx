@@ -14,9 +14,9 @@ function App() {
         <MainLayout>
           <Routes>
             <Route path="/" element={<RestaurantsPage />} />
-            <Route path="/restaurants" element={<RestaurantsPage />} />
+<Route path="/restaurants" element={<RestaurantsPage />} />
             <Route path="/menu/:restaurantId" element={<MenuPage />} />
-<Route path="/orders" element={<PlaceholderPage title="Orders" />} />
+            <Route path="/orders" element={<OrdersPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/promotions" element={<PlaceholderPage title="Promotions" />} />

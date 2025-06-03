@@ -64,7 +64,7 @@ const CartSidebar = ({
             />
           ) : (
             <>
-              <div className="space-y-1">
+<div className="space-y-1">
                 {cartItems.map((item) => (
                   <CartItem
                     key={item.id}
@@ -75,9 +75,7 @@ const CartSidebar = ({
                 ))}
               </div>
 
-              <Separator className="my-4" />
-
-              <div className="space-y-2">
+              <div className="mt-6 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
                   <PriceDisplay price={cartTotal} size="sm" />
@@ -100,8 +98,9 @@ const CartSidebar = ({
               <Button 
                 className="w-full mt-6 gradient-orange border-0 text-white hover:opacity-90"
                 size="lg"
+                disabled={cartItems.length === 0}
               >
-                Proceed to Checkout
+                Proceed to Checkout • <PriceDisplay price={finalTotal} />
               </Button>
             </>
           )}
