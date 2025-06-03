@@ -6,6 +6,7 @@ import RestaurantsPage from './pages/RestaurantsPage'
 import MenuPage from './pages/MenuPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import FavoritesPage from './pages/FavoritesPage'
+import ReviewsPage from './pages/ReviewsPage'
 function App() {
   return (
     <ThemeProvider>
