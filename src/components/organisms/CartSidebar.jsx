@@ -94,9 +94,8 @@ const CartSidebar = ({
                   <PriceDisplay price={finalTotal} size="lg" />
                 </div>
               </div>
-
-              <Button 
-                className="w-full mt-6 gradient-orange border-0 text-white hover:opacity-90"
+<Button 
+                className="w-full mt-6 gradient-primary border-0 text-white hover:opacity-90"
                 size="lg"
                 disabled={cartItems.length === 0}
               >

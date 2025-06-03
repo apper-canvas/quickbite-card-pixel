@@ -82,3 +82,18 @@
     @apply bg-background text-foreground;
   }
 }
+.food-card-hover:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Gradient utilities for cart buttons */
+  .gradient-primary {
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  }
+  
+  .gradient-primary:hover {
+    background: linear-gradient(135deg, #e55a2b 0%, #e8821a 100%);
+  }
+  
+  /* Shadow utilities for menu browsing */
