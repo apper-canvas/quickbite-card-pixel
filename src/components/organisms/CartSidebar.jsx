@@ -55,7 +55,7 @@ const CartSidebar = ({
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-6 flex-1 overflow-y-auto">
+<div className="mt-6 flex-1 overflow-y-auto">
           {cartItems.length === 0 ? (
             <EmptyState
               icon="ShoppingCart"
@@ -63,7 +63,6 @@ const CartSidebar = ({
               description="Add some delicious items from the menu to get started"
             />
           ) : (
-) : (
             <>
               <div className="space-y-1">
                 {cartItems.map((item) => (
