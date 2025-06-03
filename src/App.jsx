@@ -5,6 +5,7 @@ import MainLayout from './components/templates/MainLayout'
 import RestaurantsPage from './pages/RestaurantsPage'
 import MenuPage from './pages/MenuPage'
 import PlaceholderPage from './pages/PlaceholderPage'
+import FavoritesPage from './pages/FavoritesPage'
 function App() {
   return (
     <ThemeProvider>
