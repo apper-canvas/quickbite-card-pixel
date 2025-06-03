@@ -56,16 +56,25 @@ export const useRestaurants = () => {
     setLoading(false)
   }
 
-  useEffect(() => {
+useEffect(() => {
     fetchRestaurants()
   }, [])
 
-return {
+  const updateRestaurantRating = (restaurantId, newRating) => {
+    setRestaurants(prev => prev.map(restaurant => 
+      restaurant.id === restaurantId 
+        ? { ...restaurant, rating: newRating }
+        : restaurant
+    ))
+  }
+
+  return {
     restaurants,
     loading,
     error,
     fetchRestaurants,
     searchRestaurants,
-    filterRestaurants
+    filterRestaurants,
+    updateRestaurantRating
   }
 }

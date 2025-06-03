@@ -88,11 +88,42 @@ export const restaurantService = {
         success: true,
         data: filtered
       }
-    } catch (error) {
+} catch (error) {
       return {
         success: false,
         error: 'Failed to filter restaurants'
       }
     }
+  },
+
+  async getRestaurantReviews(restaurantId) {
+    await simulateDelay()
+    try {
+      const reviews = JSON.parse(localStorage.getItem(`reviews_${restaurantId}`) || '[]')
+      return {
+        success: true,
+        data: reviews
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to fetch restaurant reviews'
+      }
+    }
+  },
+
+  async updateRestaurantRating(restaurantId, newRating) {
+    await simulateDelay()
+    try {
+      // In a real app, this would update the backend
+      return {
+        success: true,
+        data: { rating: newRating }
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to update restaurant rating'
+      }
+    }
   }
-}

@@ -15,8 +15,9 @@ function App() {
             <Route path="/" element={<RestaurantsPage />} />
             <Route path="/restaurants" element={<RestaurantsPage />} />
             <Route path="/menu/:restaurantId" element={<MenuPage />} />
-            <Route path="/orders" element={<PlaceholderPage title="Orders" />} />
+<Route path="/orders" element={<PlaceholderPage title="Orders" />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/promotions" element={<PlaceholderPage title="Promotions" />} />
             <Route path="/account" element={<PlaceholderPage featureName="Account" />} />
           </Routes>

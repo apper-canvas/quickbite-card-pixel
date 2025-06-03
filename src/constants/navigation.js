@@ -37,6 +37,7 @@ export const ROUTES = {
   MENU: '/menu',
   ORDERS: '/orders',
   FAVORITES: '/favorites',
+  REVIEWS: '/reviews',
   PROMOTIONS: '/promotions',
   ACCOUNT: '/account'
 }

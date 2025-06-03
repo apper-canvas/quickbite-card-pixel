@@ -7,7 +7,7 @@ import RatingDisplay from '../atoms/RatingDisplay'
 import StatusBadge from '../atoms/StatusBadge'
 import { useNavigate } from 'react-router-dom'
 
-const RestaurantCard = ({ restaurant }) => {
+const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
   const navigate = useNavigate()
   const [isRestaurantFavorite, setIsRestaurantFavorite] = useState(false)
 
@@ -18,7 +18,12 @@ const RestaurantCard = ({ restaurant }) => {
   const handleFavoriteClick = () => {
     setIsRestaurantFavorite(!isRestaurantFavorite)
   }
-return (
+
+  const handleViewReviews = () => {
+    navigate(`/restaurant/${restaurant.id}/reviews`)
+  }
+
+  return (
     <Card className="food-card-hover overflow-hidden">
       <div className="relative">
         <img 
@@ -77,16 +82,47 @@ return (
           <div className="flex items-center gap-1">
             <ApperIcon name="ShoppingBag" className="h-4 w-4" />
             <span>Min ${restaurant.minimumOrder}</span>
-          </div>
+</div>
         </div>
+
+        {showReviews && reviews.length > 0 && (
+          <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>{reviews.length} review{reviews.length !== 1 ? 's' : ''}</span>
+              <button 
+                onClick={handleViewReviews}
+                className="text-orange-500 hover:text-orange-600 font-medium"
+              >
+                View All
+              </button>
+            </div>
+            {reviews[0] && (
+              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                "{reviews[0].comment}"
+              </p>
+            )}
+          </div>
+        )}
         
-        <Button 
-          onClick={handleViewMenu}
-          disabled={!restaurant.isOpen}
-          className="w-full gradient-orange border-0 text-white hover:opacity-90"
-        >
-          {restaurant.isOpen ? 'View Menu' : 'Closed'}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleViewMenu}
+            disabled={!restaurant.isOpen}
+            className="flex-1 gradient-orange border-0 text-white hover:opacity-90"
+          >
+            {restaurant.isOpen ? 'View Menu' : 'Closed'}
+          </Button>
+          {showReviews && (
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={handleViewReviews}
+              className="px-3"
+            >
+              <ApperIcon name="Star" className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   )
