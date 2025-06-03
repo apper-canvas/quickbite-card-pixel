@@ -1,0 +1,87 @@
+[
+  {
+    "id": "rest-1",
+    "name": "The Golden Spoon",
+    "cuisine": ["Italian", "Mediterranean"],
+    "address": {
+      "street": "123 Main Street",
+      "city": "Downtown",
+      "zipCode": "12345"
+    },
+    "rating": 4.8,
+    "deliveryTime": 25,
+    "minimumOrder": 15,
+    "isOpen": true,
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
+    "tags": ["Popular", "Fast Delivery"],
+    "deliveryFee": 2.99
+  },
+  {
+    "id": "rest-2",
+    "name": "Spice Garden",
+    "cuisine": ["Indian", "Asian"],
+    "address": {
+      "street": "456 Oak Avenue",
+      "city": "Midtown",
+      "zipCode": "12346"
+    },
+    "rating": 4.6,
+    "deliveryTime": 35,
+    "minimumOrder": 20,
+    "isOpen": true,
+    "image": "https://images.unsplash.com/photo-1552566342-75137f88ca03?w=400&h=300&fit=crop",
+    "tags": ["Authentic", "Spicy"],
+    "deliveryFee": 3.49
+  },
+  {
+    "id": "rest-3",
+    "name": "Burger Palace",
+    "cuisine": ["American", "Fast Food"],
+    "address": {
+      "street": "789 Elm Street",
+      "city": "Uptown",
+      "zipCode": "12347"
+    },
+    "rating": 4.4,
+    "deliveryTime": 20,
+    "minimumOrder": 12,
+    "isOpen": true,
+    "image": "https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=300&fit=crop",
+    "tags": ["Quick Bites", "Family Friendly"],
+    "deliveryFee": 1.99
+  },
+  {
+    "id": "rest-4",
+    "name": "Sushi Zen",
+    "cuisine": ["Japanese", "Sushi"],
+    "address": {
+      "street": "321 Cherry Lane",
+      "city": "Eastside",
+      "zipCode": "12348"
+    },
+    "rating": 4.9,
+    "deliveryTime": 40,
+    "minimumOrder": 25,
+    "isOpen": false,
+    "image": "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop",
+    "tags": ["Premium", "Fresh"],
+    "deliveryFee": 4.99
+  },
+  {
+    "id": "rest-5",
+    "name": "Taco Fiesta",
+    "cuisine": ["Mexican", "Latin"],
+    "address": {
+      "street": "654 Pine Road",
+      "city": "Westside",
+      "zipCode": "12349"
+    },
+    "rating": 4.5,
+    "deliveryTime": 30,
+    "minimumOrder": 15,
+    "isOpen": true,
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop",
+    "tags": ["Authentic", "Spicy"],
+    "deliveryFee": 2.49
+  }
+]

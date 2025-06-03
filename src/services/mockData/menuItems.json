@@ -1,0 +1,110 @@
+[
+  {
+    "id": "item-1",
+    "restaurantId": "rest-1",
+    "name": "Margherita Pizza",
+    "description": "Fresh tomato sauce, mozzarella cheese, and basil on hand-tossed dough",
+    "price": 14.99,
+    "category": "Pizza",
+    "customizations": [
+      {
+        "name": "Size",
+        "options": [
+          { "name": "Small", "price": 0 },
+          { "name": "Medium", "price": 3 },
+          { "name": "Large", "price": 6 }
+        ]
+      },
+      {
+        "name": "Extra Toppings",
+        "options": [
+          { "name": "Extra Cheese", "price": 2 },
+          { "name": "Pepperoni", "price": 2.5 },
+          { "name": "Mushrooms", "price": 1.5 }
+        ]
+      }
+    ],
+    "isAvailable": true,
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300&h=200&fit=crop"
+  },
+  {
+    "id": "item-2",
+    "restaurantId": "rest-1",
+    "name": "Caesar Salad",
+    "description": "Crisp romaine lettuce, parmesan cheese, croutons with classic Caesar dressing",
+    "price": 9.99,
+    "category": "Salads",
+    "customizations": [
+      {
+        "name": "Add Protein",
+        "options": [
+          { "name": "Grilled Chicken", "price": 4 },
+          { "name": "Shrimp", "price": 6 },
+          { "name": "Salmon", "price": 8 }
+        ]
+      }
+    ],
+    "isAvailable": true,
+    "image": "https://images.unsplash.com/photo-1546793665-c74683f339c1?w=300&h=200&fit=crop"
+  },
+  {
+    "id": "item-3",
+    "restaurantId": "rest-1",
+    "name": "Spaghetti Carbonara",
+    "description": "Fresh pasta with eggs, parmesan, pancetta, and black pepper",
+    "price": 16.99,
+    "category": "Pasta",
+    "customizations": [
+      {
+        "name": "Pasta Type",
+        "options": [
+          { "name": "Spaghetti", "price": 0 },
+          { "name": "Fettuccine", "price": 0 },
+          { "name": "Penne", "price": 0 }
+        ]
+      }
+    ],
+    "isAvailable": true,
+    "image": "https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=300&h=200&fit=crop"
+  },
+  {
+    "id": "item-4",
+    "restaurantId": "rest-1",
+    "name": "Tiramisu",
+    "description": "Classic Italian dessert with coffee-soaked ladyfingers and mascarpone",
+    "price": 7.99,
+    "category": "Desserts",
+    "customizations": [],
+    "isAvailable": true,
+    "image": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=300&h=200&fit=crop"
+  },
+  {
+    "id": "item-5",
+    "restaurantId": "rest-2",
+    "name": "Chicken Tikka Masala",
+    "description": "Tender chicken in a rich, creamy tomato-based curry sauce",
+    "price": 18.99,
+    "category": "Curry",
+    "customizations": [
+      {
+        "name": "Spice Level",
+        "options": [
+          { "name": "Mild", "price": 0 },
+          { "name": "Medium", "price": 0 },
+          { "name": "Hot", "price": 0 },
+          { "name": "Extra Hot", "price": 0 }
+        ]
+      },
+      {
+        "name": "Rice",
+        "options": [
+          { "name": "Basmati Rice", "price": 3 },
+          { "name": "Coconut Rice", "price": 4 },
+          { "name": "Naan Bread", "price": 3.5 }
+        ]
+      }
+    ],
+    "isAvailable": true,
+    "image": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=300&h=200&fit=crop"
+  }
+]
