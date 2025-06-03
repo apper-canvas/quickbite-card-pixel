@@ -20,7 +20,7 @@ const MenuPage = ({ addToCart }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
+useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       setError(null)
@@ -42,18 +42,26 @@ const MenuPage = ({ addToCart }) => {
         }
 
         setRestaurant(restaurantResult.data)
-        setMenu(menuResult.data)
-        setFilteredMenu(menuResult.data)
+        
+        // Group menu items by category
+        const categorizedMenu = menuResult.data.reduce((acc, item) => {
+          if (!acc[item.category]) {
+            acc[item.category] = []
+          }
+          acc[item.category].push(item)
+          return acc
+        }, {})
+        
+        setMenu(categorizedMenu)
+        setFilteredMenu(categorizedMenu)
       } catch (err) {
-        setError('Failed to load menu')
+        setError('Failed to load restaurant data')
       } finally {
         setLoading(false)
       }
     }
 
-    if (restaurantId) {
-      fetchData()
-    }
+    fetchData()
   }, [restaurantId])
 
   const handleSearch = async (query) => {
@@ -78,13 +86,14 @@ const MenuPage = ({ addToCart }) => {
     } catch (err) {
       toast.error('Failed to search menu items')
     }
-  }
+}
 
   const handleAddToCart = (item) => {
-    addToCart(item)
-    toast.success(`${item.name} added to cart`)
+    if (addToCart) {
+      addToCart(item)
+      toast.success(`${item.name} added to cart!`)
+    }
   }
-
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">

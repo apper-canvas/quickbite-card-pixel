@@ -1,34 +1,38 @@
 import React from 'react'
 import Navigation from '../organisms/Navigation'
-import { useCart } from '../../hooks/useCart'
 import CartSidebar from '../organisms/CartSidebar'
 
-const MainLayout = ({ children }) => {
-  const {
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-    getCartItemCount
-  } = useCart()
+const MainLayout = ({ 
+  children, 
+  cartItems, 
+  cartTotal, 
+  cartItemCount, 
+  updateQuantity, 
+  removeFromCart, 
+  clearCart,
+  addToCart 
+}) => {
+  // Clone children and pass addToCart prop to pages that need it
+  const childrenWithProps = React.Children.map(children, child => {
+    if (React.isValidElement(child) && child.type.name === 'MenuPage') {
+      return React.cloneElement(child, { addToCart })
+    }
+    return child
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation cartItemCount={getCartItemCount()} />
-      
-      <main className="pb-20">
-        {React.cloneElement(children, { addToCart })}
+      <Navigation />
+      <main className="container mx-auto px-4 py-8">
+        {childrenWithProps || children}
       </main>
-
-      <CartSidebar
+      <CartSidebar 
         cartItems={cartItems}
-        cartTotal={getCartTotal()}
-        cartItemCount={getCartItemCount()}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
-        onClearCart={clearCart}
+        cartTotal={cartTotal}
+        cartItemCount={cartItemCount}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
       />
     </div>
   )
