@@ -51,14 +51,10 @@ export const useRestaurants = () => {
       setRestaurants(result.data)
     } else {
       setError(result.error)
-    }
+}
     
     setLoading(false)
   }
-
-useEffect(() => {
-    fetchRestaurants()
-  }, [])
 
   const updateRestaurantRating = (restaurantId, newRating) => {
     setRestaurants(prev => prev.map(restaurant => 
@@ -67,6 +63,10 @@ useEffect(() => {
         : restaurant
     ))
   }
+
+  useEffect(() => {
+    fetchRestaurants()
+  }, [])
 
   return {
     restaurants,

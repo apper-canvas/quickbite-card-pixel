@@ -42,7 +42,7 @@ export const restaurantService = {
     }
   },
 
-  async searchRestaurants(query) {
+async searchRestaurants(query) {
     await simulateDelay()
     try {
       const filtered = restaurantsData.filter(restaurant =>
@@ -59,7 +59,7 @@ export const restaurantService = {
         error: 'Failed to search restaurants'
       }
     }
-},
+  },
 
   async filterRestaurants(filters) {
     await simulateDelay()

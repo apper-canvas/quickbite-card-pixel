@@ -17,14 +17,13 @@ const MenuPage = ({ addToCart }) => {
   const [restaurant, setRestaurant] = useState(null)
   const [menu, setMenu] = useState({})
   const [filteredMenu, setFilteredMenu] = useState({})
-  const [loading, setLoading] = useState(true)
+const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       setError(null)
-
       try {
         const [restaurantResult, menuResult] = await Promise.all([
           restaurantService.getRestaurantById(restaurantId),

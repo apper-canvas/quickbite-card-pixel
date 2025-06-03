@@ -5,23 +5,14 @@ const DELAY = 300
 const simulateDelay = () => new Promise(resolve => setTimeout(resolve, DELAY))
 
 export const menuService = {
-  async getMenuByRestaurantId(restaurantId) {
+async getMenuByRestaurantId(restaurantId) {
     await simulateDelay()
     try {
       const menuItems = menuItemsData.filter(item => item.restaurantId === restaurantId)
       
-      // Group items by category
-      const categorizedMenu = menuItems.reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = []
-        }
-        acc[item.category].push(item)
-        return acc
-      }, {})
-
       return {
         success: true,
-        data: categorizedMenu
+        data: menuItems
       }
     } catch (error) {
       return {
