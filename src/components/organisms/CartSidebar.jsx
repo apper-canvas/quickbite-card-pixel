@@ -63,8 +63,9 @@ const CartSidebar = ({
               description="Add some delicious items from the menu to get started"
             />
           ) : (
+) : (
             <>
-<div className="space-y-1">
+              <div className="space-y-1">
                 {cartItems.map((item) => (
                   <CartItem
                     key={item.id}
@@ -100,7 +101,8 @@ const CartSidebar = ({
                 size="lg"
                 disabled={cartItems.length === 0}
               >
-                Proceed to Checkout • <PriceDisplay price={finalTotal} />
+                <ApperIcon name="CreditCard" className="mr-2 h-4 w-4" />
+                Checkout ${finalTotal.toFixed(2)}
               </Button>
             </>
           )}
