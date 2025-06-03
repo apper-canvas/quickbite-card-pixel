@@ -59,7 +59,7 @@ export const restaurantService = {
         error: 'Failed to search restaurants'
       }
     }
-  },
+},
 
   async filterRestaurants(filters) {
     await simulateDelay()
@@ -88,7 +88,7 @@ export const restaurantService = {
         success: true,
         data: filtered
       }
-} catch (error) {
+    } catch (error) {
       return {
         success: false,
         error: 'Failed to filter restaurants'
@@ -127,3 +127,4 @@ export const restaurantService = {
       }
     }
   }
+}
