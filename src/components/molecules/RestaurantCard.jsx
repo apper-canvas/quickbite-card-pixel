@@ -6,7 +6,6 @@ import ApperIcon from '../ApperIcon'
 import RatingDisplay from '../atoms/RatingDisplay'
 import StatusBadge from '../atoms/StatusBadge'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 
 const RestaurantCard = ({ restaurant }) => {
   const navigate = useNavigate()
