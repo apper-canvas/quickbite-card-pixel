@@ -11,7 +11,7 @@ import { Separator } from '../components/ui/separator'
 import { Badge } from '../components/ui/badge'
 import { Avatar, AvatarImage, AvatarFallback } from '../components/ui/avatar'
 import PhotoUpload from '../components/molecules/PhotoUpload'
-import { PriceDisplay } from '../components/atoms/PriceDisplay'
+import PriceDisplay from '../components/atoms/PriceDisplay'
 import { userService } from '../services/api/userService'
 import { orderService } from '../services/api/orderService'
 import { 
@@ -243,12 +243,13 @@ const AccountsPage = () => {
                 </div>
               </CardContent>
             </Card>
-            <Card>
+<Card>
               <CardContent className="p-4 flex items-center gap-3">
-                <div className="h-8 w-8 text-primary flex items-center">
-                  <PriceDisplay amount={stats.totalSpent} className="text-2xl font-bold" />
+                <div className="h-8 w-8 text-primary flex items-center justify-center">
+                  $
                 </div>
                 <div>
+                  <PriceDisplay price={stats.totalSpent} className="text-2xl font-bold" />
                   <p className="text-sm text-muted-foreground">Total Spent</p>
                 </div>
               </CardContent>
@@ -535,8 +536,8 @@ const AccountsPage = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <PriceDisplay amount={order.total} />
+<div className="text-right">
+                        <PriceDisplay price={order.total} />
                         <Badge variant={order.status === 'delivered' ? 'default' : 'secondary'}>
                           {order.status}
                         </Badge>
