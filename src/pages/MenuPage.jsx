@@ -15,9 +15,9 @@ import { toast } from 'sonner'
 const MenuPage = ({ addToCart }) => {
   const { restaurantId } = useParams()
   const [restaurant, setRestaurant] = useState(null)
-  const [menu, setMenu] = useState({})
+const [menu, setMenu] = useState({})
   const [filteredMenu, setFilteredMenu] = useState({})
-const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
