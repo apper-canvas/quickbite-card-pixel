@@ -6,23 +6,23 @@ import ApperIcon from '../ApperIcon'
 import RatingDisplay from '../atoms/RatingDisplay'
 import StatusBadge from '../atoms/StatusBadge'
 import { useNavigate } from 'react-router-dom'
+import { useFavorites } from '../../hooks/useFavorites'
 
 const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
   const navigate = useNavigate()
-  const [isRestaurantFavorite, setIsRestaurantFavorite] = useState(false)
+  const { toggleFavorite, isFavorite } = useFavorites()
 
-  const handleViewMenu = () => {
+const handleViewMenu = () => {
     navigate(`/menu/${restaurant.id}`)
   }
 
   const handleFavoriteClick = () => {
-    setIsRestaurantFavorite(!isRestaurantFavorite)
+    toggleFavorite(restaurant)
   }
 
   const handleViewReviews = () => {
     navigate(`/restaurant/${restaurant.id}/reviews`)
   }
-
   return (
     <Card className="food-card-hover overflow-hidden">
       <div className="relative">
@@ -30,13 +30,13 @@ const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
           src={restaurant.image} 
           alt={restaurant.name}
           className="w-full h-48 object-cover"
-        />
+/>
         <div className="absolute top-2 right-2 flex gap-2">
           <Button
             size="sm"
-            variant={isRestaurantFavorite ? "default" : "secondary"}
+            variant={isFavorite(restaurant.id) ? "default" : "secondary"}
             className={`h-8 w-8 p-0 ${
-              isRestaurantFavorite 
+              isFavorite(restaurant.id) 
                 ? 'bg-red-500 hover:bg-red-600 text-white' 
                 : 'bg-white/90 hover:bg-white text-gray-600'
             }`}
@@ -44,7 +44,7 @@ const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
           >
             <ApperIcon 
               name="Heart" 
-              className={`h-4 w-4 ${isRestaurantFavorite ? 'fill-current' : ''}`} 
+              className={`h-4 w-4 ${isFavorite(restaurant.id) ? 'fill-current' : ''}`} 
             />
           </Button>
           <StatusBadge status={restaurant.isOpen ? 'open' : 'closed'}>
@@ -79,10 +79,10 @@ const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
             <ApperIcon name="DollarSign" className="h-4 w-4" />
             <span>${restaurant.deliveryFee}</span>
           </div>
-          <div className="flex items-center gap-1">
+<div className="flex items-center gap-1">
             <ApperIcon name="ShoppingBag" className="h-4 w-4" />
             <span>Min ${restaurant.minimumOrder}</span>
-</div>
+          </div>
         </div>
 
         {showReviews && reviews.length > 0 && (
