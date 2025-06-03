@@ -50,10 +50,10 @@ function App() {
             <Route path="/account" element={<AccountsPage />} />
             <Route path="*" element={<PlaceholderPage title="Page Not Found" />} />
           </Routes>
-        </MainLayout>
+</MainLayout>
         <Toaster 
           position="top-right"
-richColors 
+          richColors 
           closeButton
           duration={3000}
         />
