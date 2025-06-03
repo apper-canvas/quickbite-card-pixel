@@ -11,7 +11,7 @@ import OrdersPage from './pages/OrdersPage'
 import ReviewsPage from './pages/ReviewsPage'
 import PromotionsPage from './pages/PromotionsPage'
 import AccountsPage from './pages/AccountsPage'
-import PlaceholderPage from './components/common/PlaceholderPage'
+import PlaceholderPage from './pages/PlaceholderPage'
 
 function App() {
   const {
