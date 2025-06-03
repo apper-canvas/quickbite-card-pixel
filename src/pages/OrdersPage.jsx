@@ -242,13 +242,13 @@ const OrdersPage = () => {
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <ApperIcon name="DollarSign" className="h-5 w-5 text-green-600" />
-              <div>
+<div>
                 <p className="text-sm text-muted-foreground">Total Spent</p>
-                <p className="text-2xl font-bold">
+                <div className="text-2xl font-bold">
                   <PriceDisplay 
                     price={orders.filter(order => order.status === 'delivered').reduce((sum, order) => sum + order.total, 0)} 
                   />
-                </p>
+                </div>
               </div>
             </div>
           </CardContent>

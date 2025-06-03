@@ -17,10 +17,10 @@ const PriceDisplay = ({
 
   const formatPrice = (price) => {
     return showCurrency ? `$${price.toFixed(2)}` : price.toFixed(2)
-  }
+}
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <span className={cn('flex items-center gap-2', className)}>
       <span className={cn('font-semibold text-gray-900', sizeClasses[size])}>
         {formatPrice(price)}
       </span>
@@ -29,7 +29,7 @@ const PriceDisplay = ({
           {formatPrice(originalPrice)}
         </span>
       )}
-    </div>
+    </span>
   )
 }
 
