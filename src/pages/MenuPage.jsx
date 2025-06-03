@@ -49,11 +49,13 @@ const [loading, setLoading] = useState(true)
           }
           acc[item.category].push(item)
           return acc
-        }, {})
+}, {})
         
+        console.log('Categorized menu:', categorizedMenu)
         setMenu(categorizedMenu)
         setFilteredMenu(categorizedMenu)
       } catch (err) {
+        console.error('Error fetching data:', err)
         setError('Failed to load restaurant data')
       } finally {
         setLoading(false)

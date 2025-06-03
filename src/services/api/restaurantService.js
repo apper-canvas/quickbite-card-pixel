@@ -20,10 +20,10 @@ export const restaurantService = {
     }
   },
 
-  async getRestaurantById(id) {
+async getRestaurantById(id) {
     await simulateDelay()
     try {
-      const restaurant = restaurantsData.find(r => r.id === id)
+      const restaurant = restaurantsData.find(r => r.id === String(id))
       if (!restaurant) {
         return {
           success: false,

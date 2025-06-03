@@ -8,7 +8,7 @@ export const menuService = {
 async getMenuByRestaurantId(restaurantId) {
     await simulateDelay()
     try {
-      const menuItems = menuItemsData.filter(item => item.restaurantId === restaurantId)
+      const menuItems = menuItemsData.filter(item => item.restaurantId === String(restaurantId))
       
       return {
         success: true,
