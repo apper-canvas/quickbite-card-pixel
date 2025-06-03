@@ -10,12 +10,11 @@ import { useFavorites } from '../../hooks/useFavorites'
 
 const RestaurantCard = ({ restaurant, showReviews = false, reviews = [] }) => {
   const navigate = useNavigate()
-  const { toggleFavorite, isFavorite } = useFavorites()
+const { toggleFavorite, isFavorite } = useFavorites()
 
-const handleViewMenu = () => {
-    navigate(`/menu/${restaurant.id}`)
+  const handleViewMenu = () => {
+    navigate(`/restaurant/${restaurant.id}`)
   }
-
   const handleFavoriteClick = () => {
     toggleFavorite(restaurant)
   }

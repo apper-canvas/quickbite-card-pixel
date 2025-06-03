@@ -28,6 +28,7 @@ function App() {
         >
 <Routes>
             <Route path="/" element={<RestaurantsPage />} />
+            <Route path="/restaurants" element={<RestaurantsPage />} />
             <Route path="/restaurant/:restaurantId" element={<MenuPage addToCart={cart.addToCart} />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
