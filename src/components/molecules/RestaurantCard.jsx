@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -6,15 +6,20 @@ import ApperIcon from '../ApperIcon'
 import RatingDisplay from '../atoms/RatingDisplay'
 import StatusBadge from '../atoms/StatusBadge'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 
 const RestaurantCard = ({ restaurant }) => {
   const navigate = useNavigate()
+  const [isRestaurantFavorite, setIsRestaurantFavorite] = useState(false)
 
   const handleViewMenu = () => {
     navigate(`/menu/${restaurant.id}`)
   }
 
-  return (
+  const handleFavoriteClick = () => {
+    setIsRestaurantFavorite(!isRestaurantFavorite)
+  }
+return (
     <Card className="food-card-hover overflow-hidden">
       <div className="relative">
         <img 
@@ -22,7 +27,22 @@ const RestaurantCard = ({ restaurant }) => {
           alt={restaurant.name}
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-2 right-2">
+        <div className="absolute top-2 right-2 flex gap-2">
+          <Button
+            size="sm"
+            variant={isRestaurantFavorite ? "default" : "secondary"}
+            className={`h-8 w-8 p-0 ${
+              isRestaurantFavorite 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-white/90 hover:bg-white text-gray-600'
+            }`}
+            onClick={handleFavoriteClick}
+          >
+            <ApperIcon 
+              name="Heart" 
+              className={`h-4 w-4 ${isRestaurantFavorite ? 'fill-current' : ''}`} 
+            />
+          </Button>
           <StatusBadge status={restaurant.isOpen ? 'open' : 'closed'}>
             {restaurant.isOpen ? 'Open' : 'Closed'}
           </StatusBadge>

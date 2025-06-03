@@ -60,7 +60,7 @@ export const useRestaurants = () => {
     fetchRestaurants()
   }, [])
 
-  return {
+return {
     restaurants,
     loading,
     error,
