@@ -53,9 +53,9 @@ function App() {
         </MainLayout>
         <Toaster 
           position="top-right"
-          richColors 
+richColors 
           closeButton
-duration={3000}
+          duration={3000}
         />
       </Router>
     </ThemeProvider>
