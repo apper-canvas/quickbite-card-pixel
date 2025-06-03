@@ -4,11 +4,11 @@ import { ThemeProvider } from './context/ThemeContext'
 import MainLayout from './components/templates/MainLayout'
 import RestaurantsPage from './pages/RestaurantsPage'
 import MenuPage from './pages/MenuPage'
-import PlaceholderPage from './pages/PlaceholderPage'
 import FavoritesPage from './pages/FavoritesPage'
 import OrdersPage from './pages/OrdersPage'
 import ReviewsPage from './pages/ReviewsPage'
 import PromotionsPage from './pages/PromotionsPage'
+import AccountsPage from './pages/AccountsPage'
 
 function App() {
   return (
@@ -22,13 +22,13 @@ function App() {
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
-<Route path="/promotions" element={<PromotionsPage />} />
-           <Route path="/account" element={<PlaceholderPage />} />
-         </Routes>
-       </MainLayout>
-     </Router>
-   </ThemeProvider>
- )
+            <Route path="/promotions" element={<PromotionsPage />} />
+            <Route path="/account" element={<AccountsPage />} />
+          </Routes>
+        </MainLayout>
+      </Router>
+    </ThemeProvider>
+  )
 }
 
 export default App
