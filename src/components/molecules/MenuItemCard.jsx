@@ -12,7 +12,7 @@ const MenuItemCard = ({ item, onAddToCart }) => {
     <Card className="food-card-hover overflow-hidden">
       <div className="flex">
         <div className="flex-1 p-4">
-          <h4 className="font-semibold text-gray-900 mb-1">{item.name}</h4>
+<h4 className="font-semibold text-gray-900 mb-1">{item.name}</h4>
           <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
           <div className="flex items-center justify-between">
             <PriceDisplay price={item.price} size="lg" />
@@ -20,9 +20,9 @@ const MenuItemCard = ({ item, onAddToCart }) => {
               onClick={handleAddToCart}
               disabled={!item.isAvailable}
               size="sm"
-              className="gradient-orange border-0 text-white hover:opacity-90"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-4 py-2 rounded-md transition-colors duration-200 shadow-sm hover:shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {item.isAvailable ? 'Add' : 'Unavailable'}
+              {item.isAvailable ? 'Add to Cart' : 'Unavailable'}
             </Button>
           </div>
         </div>

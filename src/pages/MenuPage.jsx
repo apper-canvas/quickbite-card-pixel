@@ -113,14 +113,18 @@ const handleSearch = async (query) => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
-  }
+}
 
   const handleAddToCart = (item) => {
     if (addToCart) {
       addToCart(item)
       toast.success(`${item.name} added to cart!`)
+    } else {
+      toast.error('Cart functionality not available')
+      console.warn('addToCart function not provided to MenuPage')
     }
   }
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
