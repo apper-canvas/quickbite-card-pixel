@@ -1,144 +1,210 @@
 import { toast } from 'sonner'
 
-const ORDER_STORAGE_KEY = 'quickbite_orders'
-
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Helper function to generate unique order ID
-const generateOrderId = () => {
-  return 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-}
-
-// Helper function to get orders from localStorage
-const getStoredOrders = () => {
-  try {
-    const orders = localStorage.getItem(ORDER_STORAGE_KEY)
-    return orders ? JSON.parse(orders) : []
-  } catch (error) {
-    console.error('Error reading orders from localStorage:', error)
-    return []
-  }
-}
-
-// Helper function to save orders to localStorage
-const saveOrders = (orders) => {
-  try {
-    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(orders))
-  } catch (error) {
-    console.error('Error saving orders to localStorage:', error)
-    throw new Error('Failed to save orders')
-  }
-}
-
 export const orderService = {
-  // Create a new order from cart items
   async createOrder(orderData) {
     await delay(300)
-    
     try {
-      const orders = getStoredOrders()
-      
-      const newOrder = {
-        id: generateOrderId(),
-        ...orderData,
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        estimatedDeliveryTime: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        records: [{
+          Name: `Order ${Date.now()}`,
+          restaurant_name: orderData.restaurantName,
+          order_date: new Date().toISOString(),
+          status: 'pending',
+          subtotal: parseFloat(orderData.subtotal) || 0,
+          delivery_fee: parseFloat(orderData.deliveryFee) || 0,
+          service_fee: parseFloat(orderData.serviceFee) || 0,
+          total: parseFloat(orderData.total) || 0,
+          items: JSON.stringify(orderData.items || []),
+          restaurant: parseInt(orderData.restaurantId),
+          customer: parseInt(orderData.customerId) || 1
+        }]
       }
+
+      const response = await apperClient.createRecord('order', params)
       
-      orders.unshift(newOrder) // Add to beginning of array (newest first)
-      saveOrders(orders)
-      
-      // Simulate order status progression
-      setTimeout(() => {
-        this.updateOrderStatus(newOrder.id, 'confirmed')
-      }, 2000)
-      
-      return newOrder
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success)
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create order:${failedRecords}`)
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`)
+            })
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        if (successfulRecords.length > 0) {
+          return successfulRecords[0].data
+        }
+      }
+
+      throw new Error('Failed to create order')
     } catch (error) {
       console.error('Error creating order:', error)
-      throw new Error('Failed to create order')
+      throw error
     }
   },
 
-  // Get all orders for the user
   async getOrders() {
     await delay(200)
-    
     try {
-      return getStoredOrders()
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: [
+          'Name', 'restaurant_name', 'order_date', 'status', 'subtotal',
+          'delivery_fee', 'service_fee', 'total', 'items', 'restaurant', 'customer',
+          'CreatedOn', 'ModifiedOn'
+        ],
+        orderBy: [{ fieldName: 'order_date', SortType: 'DESC' }]
+      }
+
+      const response = await apperClient.fetchRecords('order', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+
+      const orders = response.data?.map(order => ({
+        id: order.Id,
+        restaurantId: order.restaurant,
+        restaurantName: order.restaurant_name,
+        status: order.status,
+        subtotal: order.subtotal || 0,
+        deliveryFee: order.delivery_fee || 0,
+        serviceFee: order.service_fee || 0,
+        total: order.total || 0,
+        items: order.items ? JSON.parse(order.items) : [],
+        createdAt: order.order_date || order.CreatedOn,
+        updatedAt: order.ModifiedOn
+      })) || []
+
+      return orders
     } catch (error) {
       console.error('Error getting orders:', error)
-      throw new Error('Failed to load orders')
+      throw error
     }
   },
 
-  // Get a specific order by ID
   async getOrderById(orderId) {
     await delay(150)
-    
     try {
-      const orders = getStoredOrders()
-      const order = orders.find(order => order.id === orderId)
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: [
+          'Name', 'restaurant_name', 'order_date', 'status', 'subtotal',
+          'delivery_fee', 'service_fee', 'total', 'items', 'restaurant', 'customer'
+        ]
+      }
+
+      const response = await apperClient.getRecordById('order', parseInt(orderId), params)
       
-      if (!order) {
+      if (!response.success) {
+        throw new Error(response.message || 'Order not found')
+      }
+
+      if (!response.data) {
         throw new Error('Order not found')
       }
-      
+
+      const order = {
+        id: response.data.Id,
+        restaurantId: response.data.restaurant,
+        restaurantName: response.data.restaurant_name,
+        status: response.data.status,
+        subtotal: response.data.subtotal || 0,
+        deliveryFee: response.data.delivery_fee || 0,
+        serviceFee: response.data.service_fee || 0,
+        total: response.data.total || 0,
+        items: response.data.items ? JSON.parse(response.data.items) : [],
+        createdAt: response.data.order_date
+      }
+
       return order
     } catch (error) {
       console.error('Error getting order:', error)
-      throw new Error('Failed to load order')
+      throw error
     }
   },
 
-  // Update order status
   async updateOrderStatus(orderId, newStatus) {
     await delay(200)
-    
     try {
-      const orders = getStoredOrders()
-      const orderIndex = orders.findIndex(order => order.id === orderId)
-      
-      if (orderIndex === -1) {
-        throw new Error('Order not found')
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        records: [{
+          Id: parseInt(orderId),
+          status: newStatus
+        }]
       }
+
+      const response = await apperClient.updateRecord('order', params)
       
-      orders[orderIndex] = {
-        ...orders[orderIndex],
-        status: newStatus,
-        updatedAt: new Date().toISOString()
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        throw new Error(response.message)
       }
-      
-      saveOrders(orders)
-      
-      // Simulate further status progression for active orders
-      if (newStatus === 'confirmed') {
-        setTimeout(() => {
-          this.updateOrderStatus(orderId, 'preparing')
-        }, 5000)
-      } else if (newStatus === 'preparing') {
-        setTimeout(() => {
-          this.updateOrderStatus(orderId, 'out-for-delivery')
-        }, 10000)
-      } else if (newStatus === 'out-for-delivery') {
-        setTimeout(() => {
-          this.updateOrderStatus(orderId, 'delivered')
-        }, 15000)
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success)
+        const failedUpdates = response.results.filter(result => !result.success)
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update order status:${failedUpdates}`)
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`)
+            })
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        if (successfulUpdates.length > 0) {
+          return successfulUpdates[0].data
+        }
       }
-      
-      return orders[orderIndex]
+
+      throw new Error('Failed to update order status')
     } catch (error) {
       console.error('Error updating order status:', error)
-      throw new Error('Failed to update order status')
+      throw error
     }
   },
 
-  // Cancel an order
   async cancelOrder(orderId) {
-    await delay(200)
-    
     try {
       const order = await this.getOrderById(orderId)
       
@@ -150,16 +216,24 @@ export const orderService = {
       return await this.updateOrderStatus(orderId, 'cancelled')
     } catch (error) {
       console.error('Error cancelling order:', error)
-      throw new Error('Failed to cancel order')
+      throw error
     }
   },
 
-  // Get order statistics
+  async getOrderHistory() {
+    try {
+      const orders = await this.getOrders()
+      return orders.filter(order => order.status === 'delivered')
+    } catch (error) {
+      console.error('Error getting order history:', error)
+      return []
+    }
+  },
+
   async getOrderStats() {
     await delay(100)
-    
     try {
-      const orders = getStoredOrders()
+      const orders = await this.getOrders()
       
       const stats = {
         totalOrders: orders.length,
@@ -180,11 +254,10 @@ export const orderService = {
       return stats
     } catch (error) {
       console.error('Error getting order stats:', error)
-      throw new Error('Failed to load order statistics')
+      throw error
     }
   },
 
-  // Get user's favorite restaurant based on order frequency
   getFavoriteRestaurant(orders) {
     if (orders.length === 0) return null
     
@@ -197,74 +270,121 @@ export const orderService = {
       .sort(([,a], [,b]) => b - a)[0]?.[0] || null
   },
 
-  // Filter orders by various criteria
   async filterOrders(filters = {}) {
     await delay(100)
-    
     try {
-      let orders = getStoredOrders()
-      
-      // Filter by status
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: [
+          'Name', 'restaurant_name', 'order_date', 'status', 'subtotal',
+          'delivery_fee', 'service_fee', 'total', 'items', 'restaurant', 'customer'
+        ],
+        where: []
+      }
+
+      // Add filter conditions
       if (filters.status && filters.status !== 'all') {
-        orders = orders.filter(order => order.status === filters.status)
-      }
-      
-      // Filter by restaurant
-      if (filters.restaurantId) {
-        orders = orders.filter(order => order.restaurantId === filters.restaurantId)
-      }
-      
-      // Filter by date range
-      if (filters.startDate) {
-        orders = orders.filter(order => 
-          new Date(order.createdAt) >= new Date(filters.startDate)
-        )
-      }
-      
-      if (filters.endDate) {
-        orders = orders.filter(order => 
-          new Date(order.createdAt) <= new Date(filters.endDate)
-        )
-      }
-      
-      // Filter by price range
-      if (filters.minTotal) {
-        orders = orders.filter(order => order.total >= filters.minTotal)
-      }
-      
-      if (filters.maxTotal) {
-        orders = orders.filter(order => order.total <= filters.maxTotal)
-      }
-      
-      // Sort orders
-      if (filters.sortBy) {
-        orders.sort((a, b) => {
-          switch (filters.sortBy) {
-            case 'newest':
-              return new Date(b.createdAt) - new Date(a.createdAt)
-            case 'oldest':
-              return new Date(a.createdAt) - new Date(b.createdAt)
-            case 'total-high':
-              return b.total - a.total
-            case 'total-low':
-              return a.total - b.total
-            default:
-              return 0
-          }
+        params.where.push({
+          fieldName: 'status',
+          operator: 'ExactMatch',
+          values: [filters.status]
         })
       }
+
+      if (filters.restaurantId) {
+        params.where.push({
+          fieldName: 'restaurant',
+          operator: 'EqualTo',
+          values: [parseInt(filters.restaurantId)]
+        })
+      }
+
+      if (filters.startDate) {
+        params.where.push({
+          fieldName: 'order_date',
+          operator: 'GreaterThanOrEqualTo',
+          values: [filters.startDate]
+        })
+      }
+
+      if (filters.endDate) {
+        params.where.push({
+          fieldName: 'order_date',
+          operator: 'LessThanOrEqualTo',
+          values: [filters.endDate]
+        })
+      }
+
+      if (filters.minTotal) {
+        params.where.push({
+          fieldName: 'total',
+          operator: 'GreaterThanOrEqualTo',
+          values: [filters.minTotal]
+        })
+      }
+
+      if (filters.maxTotal) {
+        params.where.push({
+          fieldName: 'total',
+          operator: 'LessThanOrEqualTo',
+          values: [filters.maxTotal]
+        })
+      }
+
+      // Add sorting
+      if (filters.sortBy) {
+        switch (filters.sortBy) {
+          case 'newest':
+            params.orderBy = [{ fieldName: 'order_date', SortType: 'DESC' }]
+            break
+          case 'oldest':
+            params.orderBy = [{ fieldName: 'order_date', SortType: 'ASC' }]
+            break
+          case 'total-high':
+            params.orderBy = [{ fieldName: 'total', SortType: 'DESC' }]
+            break
+          case 'total-low':
+            params.orderBy = [{ fieldName: 'total', SortType: 'ASC' }]
+            break
+          default:
+            params.orderBy = [{ fieldName: 'order_date', SortType: 'DESC' }]
+        }
+      }
+
+      const response = await apperClient.fetchRecords('order', params)
       
+      if (!response.success) {
+        console.error(response.message)
+        throw new Error(response.message)
+      }
+
+      const orders = response.data?.map(order => ({
+        id: order.Id,
+        restaurantId: order.restaurant,
+        restaurantName: order.restaurant_name,
+        status: order.status,
+        subtotal: order.subtotal || 0,
+        deliveryFee: order.delivery_fee || 0,
+        serviceFee: order.service_fee || 0,
+        total: order.total || 0,
+        items: order.items ? JSON.parse(order.items) : [],
+        createdAt: order.order_date
+      })) || []
+
       return orders
     } catch (error) {
       console.error('Error filtering orders:', error)
-      throw new Error('Failed to filter orders')
+      throw error
     }
   },
 
-  // Reorder items from a previous order
   async reorderItems(orderId) {
     await delay(200)
-    
     try {
       const order = await this.getOrderById(orderId)
       
@@ -279,18 +399,7 @@ export const orderService = {
       }))
     } catch (error) {
       console.error('Error reordering items:', error)
-      throw new Error('Failed to reorder items')
-    }
-  },
-
-  // Clear all orders (for development/testing)
-  async clearAllOrders() {
-    try {
-      localStorage.removeItem(ORDER_STORAGE_KEY)
-      return true
-    } catch (error) {
-      console.error('Error clearing orders:', error)
-      throw new Error('Failed to clear orders')
+      throw error
     }
   }
 }

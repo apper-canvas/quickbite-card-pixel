@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react'
-import { restaurantService } from '../services'
+import { restaurantService, orderService } from '../services'
 import { toast } from 'sonner'
 
 const FAVORITES_STORAGE_KEY = 'quickbite_favorites'
-const ORDER_HISTORY_STORAGE_KEY = 'quickbite_order_history'
 
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Load favorites from localStorage
+  // Load favorites from localStorage and fetch restaurant data
   useEffect(() => {
     const loadFavorites = async () => {
       try {
+        setLoading(true)
         const savedFavorites = localStorage.getItem(FAVORITES_STORAGE_KEY)
         const favoriteIds = savedFavorites ? JSON.parse(savedFavorites) : []
         
@@ -25,10 +25,13 @@ export const useFavorites = () => {
             })
           )
           setFavorites(favoritesData.filter(Boolean))
+        } else {
+          setFavorites([])
         }
       } catch (err) {
         setError('Failed to load favorites')
         console.error('Error loading favorites:', err)
+        toast.error('Failed to load favorites')
       } finally {
         setLoading(false)
       }
@@ -39,8 +42,12 @@ export const useFavorites = () => {
 
   // Save favorites to localStorage
   const saveFavoritesToStorage = (favoritesList) => {
-    const favoriteIds = favoritesList.map(restaurant => restaurant.id)
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteIds))
+    try {
+      const favoriteIds = favoritesList.map(restaurant => restaurant.id)
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favoriteIds))
+    } catch (err) {
+      console.error('Error saving favorites:', err)
+    }
   }
 
   // Add restaurant to favorites
@@ -99,41 +106,40 @@ export const useFavorites = () => {
     if (!query.trim()) return favorites
     
     return favorites.filter(restaurant =>
-      restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
-      restaurant.cuisine.some(c => c.toLowerCase().includes(query.toLowerCase()))
+      restaurant.name?.toLowerCase().includes(query.toLowerCase()) ||
+      restaurant.cuisine?.some(c => c.toLowerCase().includes(query.toLowerCase()))
     )
   }
 
-  // Order history management
-  const getOrderHistory = () => {
+  // Order history management using orderService
+  const getOrderHistory = async () => {
     try {
-      const saved = localStorage.getItem(ORDER_HISTORY_STORAGE_KEY)
-      return saved ? JSON.parse(saved) : []
+      const orders = await orderService.getOrderHistory()
+      return orders || []
     } catch (err) {
       console.error('Error loading order history:', err)
       return []
     }
   }
 
-  const addToOrderHistory = (order) => {
+  const addToOrderHistory = async (order) => {
     try {
-      const history = getOrderHistory()
-      const newOrder = {
-        ...order,
-        id: Date.now(),
-        timestamp: new Date().toISOString()
-      }
-      
-      const updatedHistory = [newOrder, ...history].slice(0, 50) // Keep last 50 orders
-      localStorage.setItem(ORDER_HISTORY_STORAGE_KEY, JSON.stringify(updatedHistory))
+      // In a real app, this would be handled when creating an order
+      // For now, just log that order was added
+      console.log('Order added to history:', order)
     } catch (err) {
       console.error('Error saving order history:', err)
     }
   }
 
-  const getRestaurantOrders = (restaurantId) => {
-    const history = getOrderHistory()
-    return history.filter(order => order.restaurantId === restaurantId)
+  const getRestaurantOrders = async (restaurantId) => {
+    try {
+      const allOrders = await orderService.getOrders()
+      return allOrders.filter(order => order.restaurantId === restaurantId)
+    } catch (err) {
+      console.error('Error getting restaurant orders:', err)
+      return []
+    }
   }
 
   return {

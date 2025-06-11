@@ -1,202 +1,384 @@
-const DELAY = 300
+import { toast } from 'sonner'
 
-const simulateDelay = () => new Promise(resolve => setTimeout(resolve, DELAY))
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 export const reviewService = {
   async getAllReviews() {
-    await simulateDelay()
+    await delay(300)
     try {
-      const allReviews = []
-      const keys = Object.keys(localStorage).filter(key => key.startsWith('reviews_'))
-      
-      keys.forEach(key => {
-        const restaurantReviews = JSON.parse(localStorage.getItem(key) || '[]')
-        allReviews.push(...restaurantReviews)
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       })
-      
-      // Sort by date (newest first)
-      allReviews.sort((a, b) => new Date(b.date) - new Date(a.date))
-      
-      return {
-        success: true,
-        data: allReviews
+
+      const params = {
+        fields: [
+          'Name', 'user_name', 'rating', 'comment', 'photos', 'date', 'helpful',
+          'restaurant', 'user', 'CreatedOn', 'ModifiedOn'
+        ],
+        orderBy: [{ fieldName: 'date', SortType: 'DESC' }]
       }
+
+      const response = await apperClient.fetchRecords('review', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        return { success: false, error: response.message }
+      }
+
+      const reviews = response.data?.map(review => ({
+        id: review.Id,
+        restaurantId: review.restaurant,
+        userName: review.user_name || 'Anonymous User',
+        rating: review.rating || 0,
+        comment: review.comment || '',
+        photos: review.photos ? review.photos.split(',') : [],
+        date: review.date || review.CreatedOn,
+        helpful: review.helpful || 0
+      })) || []
+
+      return { success: true, data: reviews }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to fetch reviews'
-      }
+      console.error('Error fetching reviews:', error)
+      return { success: false, error: 'Failed to fetch reviews' }
     }
   },
 
   async getRestaurantReviews(restaurantId) {
-    await simulateDelay()
+    await delay(300)
     try {
-      const reviews = JSON.parse(localStorage.getItem(`reviews_${restaurantId}`) || '[]')
-      return {
-        success: true,
-        data: reviews
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: [
+          'Name', 'user_name', 'rating', 'comment', 'photos', 'date', 'helpful',
+          'restaurant', 'user'
+        ],
+        where: [
+          {
+            fieldName: 'restaurant',
+            operator: 'EqualTo',
+            values: [parseInt(restaurantId)]
+          }
+        ],
+        orderBy: [{ fieldName: 'date', SortType: 'DESC' }]
       }
+
+      const response = await apperClient.fetchRecords('review', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        return { success: false, error: response.message }
+      }
+
+      const reviews = response.data?.map(review => ({
+        id: review.Id,
+        restaurantId: review.restaurant,
+        userName: review.user_name || 'Anonymous User',
+        rating: review.rating || 0,
+        comment: review.comment || '',
+        photos: review.photos ? review.photos.split(',') : [],
+        date: review.date,
+        helpful: review.helpful || 0
+      })) || []
+
+      return { success: true, data: reviews }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to fetch restaurant reviews'
-      }
+      console.error('Error fetching restaurant reviews:', error)
+      return { success: false, error: 'Failed to fetch restaurant reviews' }
     }
   },
 
   async addReview(reviewData) {
-    await simulateDelay()
+    await delay(300)
     try {
-      const { restaurantId, rating, comment, photos, userName } = reviewData
-      
-      const newReview = {
-        id: Date.now().toString(),
-        restaurantId,
-        userName: userName || 'Anonymous User',
-        rating,
-        comment,
-        photos: photos || [],
-        date: new Date().toISOString(),
-        helpful: 0
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        records: [{
+          Name: `Review by ${reviewData.userName}`,
+          user_name: reviewData.userName || 'Anonymous User',
+          rating: parseInt(reviewData.rating) || 5,
+          comment: reviewData.comment || '',
+          photos: Array.isArray(reviewData.photos) ? reviewData.photos.join(',') : '',
+          date: new Date().toISOString(),
+          helpful: 0,
+          restaurant: parseInt(reviewData.restaurantId),
+          user: parseInt(reviewData.userId) || 1
+        }]
       }
 
-      // Get existing reviews for this restaurant
-      const existingReviews = JSON.parse(localStorage.getItem(`reviews_${restaurantId}`) || '[]')
-      existingReviews.unshift(newReview)
+      const response = await apperClient.createRecord('review', params)
       
-      // Save updated reviews
-      localStorage.setItem(`reviews_${restaurantId}`, JSON.stringify(existingReviews))
-
-      return {
-        success: true,
-        data: newReview
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return { success: false, error: response.message }
       }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success)
+        const failedRecords = response.results.filter(result => !result.success)
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create review:${failedRecords}`)
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              toast.error(`${error.fieldLabel}: ${error.message}`)
+            })
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        if (successfulRecords.length > 0) {
+          return { success: true, data: successfulRecords[0].data }
+        }
+      }
+
+      return { success: false, error: 'Failed to add review' }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to add review'
-      }
+      console.error('Error adding review:', error)
+      return { success: false, error: 'Failed to add review' }
     }
   },
 
   async deleteReview(reviewId, restaurantId) {
-    await simulateDelay()
+    await delay(200)
     try {
-      const reviews = JSON.parse(localStorage.getItem(`reviews_${restaurantId}`) || '[]')
-      const updatedReviews = reviews.filter(review => review.id !== reviewId)
-      
-      localStorage.setItem(`reviews_${restaurantId}`, JSON.stringify(updatedReviews))
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
 
-      return {
-        success: true,
-        data: { deleted: true }
+      const params = {
+        RecordIds: [parseInt(reviewId)]
       }
+
+      const response = await apperClient.deleteRecord('review', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return { success: false, error: response.message }
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success)
+        const failedDeletions = response.results.filter(result => !result.success)
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete review:${failedDeletions}`)
+          failedDeletions.forEach(record => {
+            if (record.message) toast.error(record.message)
+          })
+        }
+        
+        return { success: successfulDeletions.length > 0, data: { deleted: true } }
+      }
+
+      return { success: false, error: 'Failed to delete review' }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to delete review'
-      }
+      console.error('Error deleting review:', error)
+      return { success: false, error: 'Failed to delete review' }
     }
   },
 
   async updateReviewHelpful(reviewId, restaurantId) {
-    await simulateDelay()
+    await delay(200)
     try {
-      const reviews = JSON.parse(localStorage.getItem(`reviews_${restaurantId}`) || '[]')
-      const updatedReviews = reviews.map(review => 
-        review.id === reviewId 
-          ? { ...review, helpful: review.helpful + 1 }
-          : review
-      )
-      
-      localStorage.setItem(`reviews_${restaurantId}`, JSON.stringify(updatedReviews))
+      // First get current helpful count
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
 
-      return {
-        success: true,
-        data: { updated: true }
+      const getParams = {
+        fields: ['helpful']
       }
+
+      const getResponse = await apperClient.getRecordById('review', parseInt(reviewId), getParams)
+      
+      if (!getResponse.success) {
+        return { success: false, error: 'Failed to get review' }
+      }
+
+      const currentHelpful = getResponse.data.helpful || 0
+
+      const updateParams = {
+        records: [{
+          Id: parseInt(reviewId),
+          helpful: currentHelpful + 1
+        }]
+      }
+
+      const response = await apperClient.updateRecord('review', updateParams)
+      
+      if (!response.success) {
+        console.error(response.message)
+        toast.error(response.message)
+        return { success: false, error: response.message }
+      }
+
+      return { success: true, data: { updated: true } }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to update review'
-      }
+      console.error('Error updating review helpful:', error)
+      return { success: false, error: 'Failed to update review' }
     }
   },
 
   async searchReviews(query) {
-    await simulateDelay()
+    await delay(300)
     try {
-      const allReviews = []
-      const keys = Object.keys(localStorage).filter(key => key.startsWith('reviews_'))
-      
-      keys.forEach(key => {
-        const restaurantReviews = JSON.parse(localStorage.getItem(key) || '[]')
-        allReviews.push(...restaurantReviews)
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       })
-      
-      const filtered = allReviews.filter(review =>
-        review.comment.toLowerCase().includes(query.toLowerCase()) ||
-        review.userName.toLowerCase().includes(query.toLowerCase())
-      )
-      
-      return {
-        success: true,
-        data: filtered
+
+      const params = {
+        fields: [
+          'Name', 'user_name', 'rating', 'comment', 'photos', 'date', 'helpful',
+          'restaurant', 'user'
+        ],
+        whereGroups: [
+          {
+            operator: 'OR',
+            subGroups: [
+              {
+                conditions: [
+                  {
+                    fieldName: 'comment',
+                    operator: 'Contains',
+                    values: [query]
+                  },
+                  {
+                    fieldName: 'user_name',
+                    operator: 'Contains',
+                    values: [query]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        orderBy: [{ fieldName: 'date', SortType: 'DESC' }]
       }
+
+      const response = await apperClient.fetchRecords('review', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        return { success: false, error: response.message }
+      }
+
+      const reviews = response.data?.map(review => ({
+        id: review.Id,
+        restaurantId: review.restaurant,
+        userName: review.user_name || 'Anonymous User',
+        rating: review.rating || 0,
+        comment: review.comment || '',
+        photos: review.photos ? review.photos.split(',') : [],
+        date: review.date,
+        helpful: review.helpful || 0
+      })) || []
+
+      return { success: true, data: reviews }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to search reviews'
-      }
+      console.error('Error searching reviews:', error)
+      return { success: false, error: 'Failed to search reviews' }
     }
   },
 
   async filterReviews(filters) {
-    await simulateDelay()
+    await delay(300)
     try {
-      const allReviews = []
-      const keys = Object.keys(localStorage).filter(key => key.startsWith('reviews_'))
-      
-      keys.forEach(key => {
-        const restaurantReviews = JSON.parse(localStorage.getItem(key) || '[]')
-        allReviews.push(...restaurantReviews)
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       })
-      
-      let filtered = [...allReviews]
 
+      const params = {
+        fields: [
+          'Name', 'user_name', 'rating', 'comment', 'photos', 'date', 'helpful',
+          'restaurant', 'user'
+        ],
+        where: [],
+        orderBy: [{ fieldName: 'date', SortType: 'DESC' }]
+      }
+
+      // Add filter conditions
       if (filters.rating) {
-        filtered = filtered.filter(review => review.rating >= filters.rating)
+        params.where.push({
+          fieldName: 'rating',
+          operator: 'GreaterThanOrEqualTo',
+          values: [parseInt(filters.rating)]
+        })
       }
 
       if (filters.hasPhotos) {
-        filtered = filtered.filter(review => review.photos && review.photos.length > 0)
+        params.where.push({
+          fieldName: 'photos',
+          operator: 'HasValue',
+          values: []
+        })
       }
 
       if (filters.restaurantId) {
-        filtered = filtered.filter(review => review.restaurantId === filters.restaurantId)
+        params.where.push({
+          fieldName: 'restaurant',
+          operator: 'EqualTo',
+          values: [parseInt(filters.restaurantId)]
+        })
       }
 
       if (filters.dateRange) {
         const { start, end } = filters.dateRange
-        filtered = filtered.filter(review => {
-          const reviewDate = new Date(review.date)
-          return reviewDate >= start && reviewDate <= end
+        params.where.push({
+          fieldName: 'date',
+          operator: 'GreaterThanOrEqualTo',
+          values: [start.toISOString()]
+        })
+        params.where.push({
+          fieldName: 'date',
+          operator: 'LessThanOrEqualTo',
+          values: [end.toISOString()]
         })
       }
 
-      // Sort by date (newest first)
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date))
+      const response = await apperClient.fetchRecords('review', params)
+      
+      if (!response.success) {
+        console.error(response.message)
+        return { success: false, error: response.message }
+      }
 
-      return {
-        success: true,
-        data: filtered
-      }
+      const reviews = response.data?.map(review => ({
+        id: review.Id,
+        restaurantId: review.restaurant,
+        userName: review.user_name || 'Anonymous User',
+        rating: review.rating || 0,
+        comment: review.comment || '',
+        photos: review.photos ? review.photos.split(',') : [],
+        date: review.date,
+        helpful: review.helpful || 0
+      })) || []
+
+      return { success: true, data: reviews }
     } catch (error) {
-      return {
-        success: false,
-        error: 'Failed to filter reviews'
-      }
+      console.error('Error filtering reviews:', error)
+      return { success: false, error: 'Failed to filter reviews' }
     }
   }
 }
